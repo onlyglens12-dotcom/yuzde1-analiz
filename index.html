@@ -302,7 +302,7 @@ async function startAnalysis() {
       });
     }
 
-    const prompt = `Sen Etsy'de 5+ yıl deneyimli POD ve dijital ürün uzmanı bir e-ticaret danışmanısın. Türkçe yanıt ver.
+    const prompt = `You are an expert Etsy SEO and POD consultant with 5+ years experience. Respond in Turkish but ensure all JSON is valid.
 
 ÜRÜN: ${category} — ${niche}
 Hedef Kitle: ${gv('audience') || 'Belirtilmedi'}
@@ -321,7 +321,7 @@ SORULAR: ${gv('extraQuestions') || 'Yok'}
 
 ${photos.length > 0 ? 'Fotoğrafları analiz et. Her biri için güçlü/zayıf yönler ve iyileştirme önerileri ver.' : ''}
 
-Sadece JSON döndür:
+Respond ONLY with valid JSON, no other text:
 {
   "overall_score": 72,
   "verdict": "2-3 cümlelik değerlendirme",
