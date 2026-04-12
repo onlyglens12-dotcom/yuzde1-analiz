@@ -361,8 +361,11 @@ Respond ONLY with valid JSON, no other text:
     if (!res.ok) throw new Error(`Sunucu hatası: ${res.status}`);
     const aiData = await res.json();
     if (aiData.error) throw new Error(aiData.error.message || 'AI hatası');
-    const clean = aiData.content[0].text.replace(/```json|```/g, '').trim();
-    const analysis = JSON.parse(clean);
+    let rawText = aiData.content[0].text.replace(/```json|```/g, '').trim();
+const jsonStart = rawText.indexOf('{');
+const jsonEnd = rawText.lastIndexOf('}');
+const clean = rawText.substring(jsonStart, jsonEnd + 1);
+const analysis = JSON.parse(clean);
 
     await incrementUsage(email);
     await updateUsage(email);
