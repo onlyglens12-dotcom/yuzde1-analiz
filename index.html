@@ -302,53 +302,18 @@ async function startAnalysis() {
       });
     }
 
-    const prompt = `You are an expert Etsy SEO and POD consultant with 5+ years experience. Respond in Turkish but ensure all JSON is valid.
+    const prompt = `You are an Etsy SEO expert. Respond ONLY with valid JSON, no explanation.
 
-ÜRÜN: ${category} — ${niche}
-Hedef Kitle: ${gv('audience') || 'Belirtilmedi'}
-Fiyat: ${price ? '$'+price : 'Belirtilmedi'}
-Mevcut Başlık: ${gv('currentTitle') || 'Yok'}
-Mevcut Taglar: ${gv('currentTags') || 'Yok'}
-Rakipler: ${gv('competitors') || 'Yok'}
-Fotoğraf: ${photos.length} adet
+Product: ${category} - ${niche}
+Price: ${price ? '$'+price : 'unknown'}
+Title: ${gv('currentTitle') || 'none'}
+Tags: ${gv('currentTags') || 'none'}
+${isNew ? 'New product.' : `Sales: ${monthlySales}/mo, Views: ${views}/mo`}
+Questions: ${gv('extraQuestions') || 'none'}
+Photos: ${photos.length}
 
-METRİKLER: ${isNew ? 'YENİ ÜRÜN — Başlangıç stratejisi öner.' : `Satış: ${monthlySales}/ay, Görüntülenme: ${views}/ay, Favori: ${favorites}/ay, Reklam: ${adSpend?'$'+adSpend:'Yok'}, CPC: ${cpc?'$'+cpc:'Bilinmiyor'}, Maliyet: ${costPrice?'$'+costPrice:'Bilinmiyor'}`}
-${metrics.convRate ? `Conversion: %${metrics.convRate}` : ''}
-${metrics.roas ? `ROAS: ${metrics.roas}x` : ''}
-${metrics.monthlyProfit ? `Aylık Net Kâr: $${metrics.monthlyProfit}` : ''}
-
-SORULAR: ${gv('extraQuestions') || 'Yok'}
-
-${photos.length > 0 ? 'Fotoğrafları analiz et. Her biri için güçlü/zayıf yönler ve iyileştirme önerileri ver.' : ''}
-
-Respond ONLY with valid JSON, no other text:
-{
-  "overall_score": 72,
-  "verdict": "2-3 cümlelik değerlendirme",
-  "verdict_level": "good",
-  "strengths": ["güçlü yön 1", "güçlü yön 2"],
-  "weaknesses": ["zayıf yön 1", "zayıf yön 2"],
-  "photo_analysis": [{"photo_num": 1, "positives": ["iyi"], "negatives": ["eksik"], "tip": "öneri"}],
-  "seo_titles": [
-    {"title": "başlık 1", "why": "neden iyi"},
-    {"title": "başlık 2", "why": "neden iyi"},
-    {"title": "başlık 3", "why": "neden iyi"}
-  ],
-  "tags": ["tag1","tag2","tag3","tag4","tag5","tag6","tag7","tag8","tag9","tag10","tag11","tag12","tag13"],
-  "metrics_analysis": {
-    "ctr_verdict": "CTR değerlendirmesi",
-    "conv_verdict": "Conversion değerlendirmesi",
-    "roas_verdict": "ROAS değerlendirmesi",
-    "roas_tips": ["öneri 1", "öneri 2", "öneri 3"]
-  },
-  "recommendations": [
-    {"priority": "high", "text": "öneri"},
-    {"priority": "medium", "text": "öneri"},
-    {"priority": "low", "text": "öneri"}
-  ],
-  "quick_wins": ["adım 1", "adım 2", "adım 3"],
-  "qa_answers": [{"question": "soru", "answer": "cevap"}]
-}`;
+Return this JSON with Turkish values filled in:
+{"overall_score":0,"verdict":"","verdict_level":"good","strengths":[],"weaknesses":[],"photo_analysis":[],"seo_titles":[{"title":"","why":""},{"title":"","why":""},{"title":"","why":""}],"tags":["","","","","","","","","","","","",""],"metrics_analysis":{"ctr_verdict":"","conv_verdict":"","roas_verdict":"","roas_tips":[]},"recommendations":[{"priority":"high","text":""},{"priority":"medium","text":""},{"priority":"low","text":""}],"quick_wins":[],"qa_answers":[]}`;
 
     content.push({ type: 'text', text: prompt });
 
