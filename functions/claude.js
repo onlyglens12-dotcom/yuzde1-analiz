@@ -1,4 +1,6 @@
-exports.handler = async (event) => {
+exports.handler = async (event, context) => {
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
