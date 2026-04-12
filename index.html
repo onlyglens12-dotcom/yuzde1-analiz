@@ -454,6 +454,7 @@ function goStep(n) {
 
   if (n > 1 && (!email || !email.includes('@'))) { showError('Geçerli bir email adresi gir.'); return; }
   if (n > 1 && !category) { showError('Ürün kategorisini seç.'); return; }
+  if (n > 1) { document.getElementById('price').value = document.getElementById('price').value.replace(',', '.'); }
   if (n > 1 && !document.getElementById('niche').value.trim()) { showError('Niş / tema alanını doldur.'); return; }
 
   document.getElementById(`step${currentStep}`).classList.remove('active');
