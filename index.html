@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Etsy Ürün Analiz Aracı — %1 Elit Akademi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-dim: #5C4A10;
+  --black: #0A0A0A;
+  --dark: #111111;
+  --card: #141414;
+  --border: rgba(212,175,55,0.15);
+  --border-strong: rgba(212,175,55,0.4);
+  --white: #F0EAD6;
+  --gray: #888888;
+  --gray-dim: #333333;
+  --green: #2ECC71;
+  --green-bg: rgba(46,204,113,0.1);
+  --red: #E74C3C;
+  --red-bg: rgba(231,76,60,0.1);
+  --yellow: #F39C12;
+  --yellow-bg: rgba(243,156,18,0.1);
+  --blue: #3498DB;
+  --blue-bg: rgba(52,152,219,0.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+header {
+  background: var(--dark); border-bottom: 0.5px solid var(--border);
+  padding: 0 40px; display: flex; align-items: center; justify-content: space-between;
+  height: 60px; position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: 'Playfair Display', serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+.usage-badge { font-size: 11px; color: var(--gray); border: 0.5px solid var(--border); padding: 4px 12px; border-radius: 2px; }
+.usage-count { color: var(--gold); font-weight: 600; }
+
+.hero { text-align: center; padding: 48px 24px 36px; max-width: 720px; margin: 0 auto; }
+.hero-tag { display: inline-block; border: 0.5px solid var(--border-strong); color: var(--gold); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 5px 16px; border-radius: 2px; margin-bottom: 16px; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--white); line-height: 1.2; margin-bottom: 10px; }
+.hero h1 span { color: var(--gold); }
+.hero p { font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+/* STEPS */
+.steps-nav { display: flex; justify-content: center; gap: 0; margin: 0 auto 40px; max-width: 700px; padding: 0 24px; }
+.step-nav-item { flex: 1; text-align: center; padding: 12px 8px; border-bottom: 2px solid var(--border); color: var(--gray); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
+.step-nav-item.active { border-bottom-color: var(--gold); color: var(--gold); }
+.step-nav-item.done { border-bottom-color: var(--green); color: var(--green); }
+.step-num-badge { display: inline-block; width: 20px; height: 20px; border-radius: 50%; border: 1px solid currentColor; font-size: 10px; line-height: 20px; margin-right: 6px; }
+
+/* FORM */
+.form-container { max-width: 720px; margin: 0 auto; padding: 0 24px 40px; }
+.form-step { display: none; }
+.form-step.active { display: block; }
+
+.form-section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--gold); margin-bottom: 6px; }
+.form-section-desc { font-size: 13px; color: var(--gray); margin-bottom: 24px; line-height: 1.6; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.form-grid.single { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group.full { grid-column: 1 / -1; }
+
+label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+.label-optional { font-size: 10px; color: var(--gray); font-weight: 400; letter-spacing: 0; text-transform: none; margin-left: 6px; }
+
+input[type="text"], input[type="email"], input[type="number"], select, textarea {
+  background: var(--card); border: 0.5px solid var(--border); border-radius: 2px;
+  padding: 12px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+  color: var(--white); outline: none; transition: border-color 0.2s; width: 100%;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--border-strong); }
+input::placeholder, textarea::placeholder { color: var(--gray); }
+select option { background: #1a1a1a; }
+textarea { resize: vertical; min-height: 90px; }
+
+/* PHOTO UPLOAD */
+.photo-upload-area {
+  border: 1.5px dashed var(--border-strong); border-radius: 4px; padding: 32px;
+  text-align: center; cursor: pointer; transition: all 0.2s; background: var(--card);
+}
+.photo-upload-area:hover { border-color: var(--gold); background: rgba(212,175,55,0.04); }
+.upload-icon { font-size: 32px; margin-bottom: 12px; }
+.upload-text { font-size: 14px; color: var(--white); margin-bottom: 4px; }
+.upload-sub { font-size: 12px; color: var(--gray); }
+#photoInput { display: none; }
+
+.photo-previews { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 16px; }
+.photo-preview { position: relative; aspect-ratio: 1; border-radius: 4px; overflow: hidden; border: 0.5px solid var(--border); }
+.photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.photo-remove { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; background: var(--red); border-radius: 50%; border: none; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* METRICS */
+.metrics-note { background: var(--blue-bg); border: 0.5px solid rgba(52,152,219,0.3); border-radius: 4px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; color: var(--blue); line-height: 1.6; }
+.new-product-note { background: var(--yellow-bg); border: 0.5px solid rgba(243,156,18,0.3); border-radius: 4px; padding: 12px 16px; margin-bottom: 20px; font-size: 12px; color: var(--yellow); line-height: 1.6; }
+
+/* BUTTONS */
+.btn-row { display: flex; gap: 12px; margin-top: 24px; }
+.btn-next { flex: 1; background: var(--gold); color: var(--black); border: none; border-radius: 2px; padding: 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; }
+.btn-next:hover { opacity: 0.88; }
+.btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-back { background: none; border: 0.5px solid var(--border); color: var(--gray); border-radius: 2px; padding: 14px 24px; font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.2s; }
+.btn-back:hover { border-color: var(--gold); color: var(--gold); }
+
+/* LOADING */
+.loading { display: none; text-align: center; padding: 60px 24px; max-width: 640px; margin: 0 auto; }
+.loading-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+.dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; animation: pulse 1.4s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1} }
+.loading-title { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); margin-bottom: 8px; }
+.loading p { font-size: 13px; color: var(--gray); margin-bottom: 20px; }
+.loading-steps { display: flex; flex-direction: column; gap: 8px; }
+.loading-step { font-size: 12px; color: var(--gray-dim); }
+.loading-step.active { color: var(--gold); }
+.loading-step.done { color: var(--green); }
+
+/* RESULTS */
+.results { display: none; max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+
+.score-header { background: var(--card); border: 0.5px solid var(--border); border-radius: 4px; padding: 28px 32px; margin-bottom: 20px; display: flex; align-items: center; gap: 28px; }
+.score-circle { width: 110px; height: 110px; border-radius: 50%; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 3px solid; }
+.score-num { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; line-height: 1; }
+.score-lbl { font-size: 10px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; margin-top: 2px; }
+.score-info { flex: 1; }
+.score-product { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--white); margin-bottom: 6px; }
+.score-verdict { font-size: 13px; line-height: 1.7; margin-bottom: 14px; }
+.score-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.score-tag { font-size: 11px; padding: 4px 12px; border-radius: 2px; }
+.score-tag.green { background: var(--green-bg); color: var(--green); border: 0.5px solid rgba(46,204,113,0.3); }
+.score-tag.red { background: var(--red-bg); color: var(--red); border: 0.5px solid rgba(231,76,60,0.3); }
+
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.metric-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 4px; padding: 16px; text-align: center; }
+.metric-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--gray); margin-bottom: 6px; }
+.metric-value { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 2px; }
+.metric-sub { font-size: 11px; color: var(--gray); }
+
+.analysis-section { background: var(--card); border: 0.5px solid var(--border); border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+.section-header { padding: 14px 20px; border-bottom: 0.5px solid var(--border); background: rgba(212,175,55,0.04); display: flex; align-items: center; gap: 10px; }
+.section-icon { font-size: 15px; }
+.section-title { font-size: 13px; font-weight: 600; color: var(--gold); flex: 1; }
+.section-body { padding: 20px; }
+
+.title-option { background: rgba(212,175,55,0.04); border: 0.5px solid var(--border); border-radius: 4px; padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.title-option:last-child { margin-bottom: 0; }
+.title-text { font-size: 13px; color: var(--white); line-height: 1.6; flex: 1; }
+.title-len { font-size: 10px; color: var(--gray); flex-shrink: 0; margin-top: 2px; }
+.copy-btn { font-size: 10px; color: var(--gray); background: none; border: 0.5px solid var(--border); padding: 3px 10px; border-radius: 2px; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; flex-shrink: 0; transition: all 0.2s; }
+.copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+.copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+.tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.tag-chip { background: rgba(212,175,55,0.08); border: 0.5px solid var(--border-strong); color: var(--gold); font-size: 12px; padding: 5px 14px; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
+.tag-chip:hover { background: rgba(212,175,55,0.15); }
+
+.photo-feedback { background: rgba(212,175,55,0.03); border: 0.5px solid var(--border); border-radius: 4px; padding: 14px 16px; margin-bottom: 10px; }
+.photo-feedback:last-child { margin-bottom: 0; }
+.photo-feedback-title { font-size: 12px; font-weight: 600; color: var(--gold); margin-bottom: 8px; }
+.photo-feedback-items { display: flex; flex-direction: column; gap: 4px; }
+.fb-item { font-size: 12px; line-height: 1.5; display: flex; gap: 8px; }
+.fb-item.good { color: var(--green); }
+.fb-item.bad { color: var(--red); }
+.fb-item.tip { color: rgba(240,234,214,0.7); }
+
+.roas-calc { background: rgba(212,175,55,0.04); border: 0.5px solid var(--border); border-radius: 4px; padding: 20px; }
+.roas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+.roas-item { text-align: center; }
+.roas-label { font-size: 10px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.roas-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+.roas-divider { height: 0.5px; background: var(--border); margin: 12px 0; }
+.roas-verdict { font-size: 13px; line-height: 1.6; }
+
+.item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 13px; line-height: 1.6; }
+.item:last-child { margin-bottom: 0; }
+.item-icon { font-size: 13px; flex-shrink: 0; margin-top: 2px; }
+.item-text { color: rgba(240,234,214,0.8); }
+
+.rec-item { border-left: 3px solid var(--gold); border-radius: 2px; padding: 12px 16px; margin-bottom: 10px; background: rgba(212,175,55,0.03); border-top: 0.5px solid var(--border); border-right: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); }
+.rec-item:last-child { margin-bottom: 0; }
+.rec-priority { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.rec-priority.high { color: var(--red); }
+.rec-priority.medium { color: var(--yellow); }
+.rec-priority.low { color: var(--green); }
+.rec-text { font-size: 13px; color: rgba(240,234,214,0.85); line-height: 1.6; }
+
+.qa-item { background: rgba(212,175,55,0.03); border: 0.5px solid var(--border); border-radius: 4px; padding: 16px; margin-bottom: 10px; }
+.qa-item:last-child { margin-bottom: 0; }
+.qa-q { font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 8px; }
+.qa-a { font-size: 13px; color: rgba(240,234,214,0.8); line-height: 1.7; }
+
+.disclaimer { font-size: 11px; color: var(--gray-dim); text-align: center; margin-top: 20px; line-height: 1.6; padding: 12px; border: 0.5px solid var(--border); border-radius: 2px; }
+.new-btn { display: block; width: 100%; text-align: center; background: none; border: 0.5px solid var(--border); color: var(--gray); padding: 14px; border-radius: 2px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; margin-top: 20px; transition: all 0.2s; }
+.new-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+.error-box { background: var(--red-bg); border: 0.5px solid rgba(231,76,60,0.4); border-radius: 4px; padding: 16px 20px; margin: 0 24px 20px; font-size: 13px; color: var(--red); text-align: center; display: none; }
+
+footer { text-align: center; padding: 28px; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--gray); }
+footer span { color: var(--gold); }
+
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .metrics-row { grid-template-columns: repeat(2, 1fr); }
+  .score-header { flex-direction: column; text-align: center; }
+  .roas-grid { grid-template-columns: 1fr; }
+  .photo-previews { grid-template-columns: repeat(3, 1fr); }
+  header { padding: 0 16px; }
+  .hero h1 { font-size: 28px; }
+  .steps-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">%1 Elit E-Ticaret</div>
+  <div class="usage-badge">Bu ay: <span class="usage-count" id="usageCount">?</span>/10 analiz</div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">Üye Özel Araç</div>
+  <h1>Etsy Ürün <span>Analiz Aracı</span></h1>
+  <p>Fotoğraf analizi, SEO başlık önerileri, long-tail tag'ler, CTR/ROAS hesabı ve conversion tavsiyeleri.</p>
+</section>
+
+<div class="steps-nav">
+  <div class="step-nav-item active" id="nav1"><span class="step-num-badge">1</span>Temel Bilgi</div>
+  <div class="step-nav-item" id="nav2"><span class="step-num-badge">2</span>Fotoğraflar</div>
+  <div class="step-nav-item" id="nav3"><span class="step-num-badge">3</span>Metrikler</div>
+  <div class="step-nav-item" id="nav4"><span class="step-num-badge">4</span>Sorular</div>
+</div>
+
+<div class="form-container">
+
+  <!-- STEP 1 -->
+  <div class="form-step active" id="step1">
+    <div class="form-section-title">Ürün Bilgileri</div>
+    <div class="form-section-desc">Analiz edilecek ürün hakkında temel bilgileri gir.</div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Email Adresin</label>
+        <input type="email" id="userEmail" placeholder="ornek@gmail.com" />
+      </div>
+      <div class="form-group">
+        <label>Etsy Mağaza Adı <span class="label-optional">(isteğe bağlı)</span></label>
+        <input type="text" id="shopName" placeholder="CoolCatDesigns" />
+      </div>
+      <div class="form-group">
+        <label>Ürün Kategorisi</label>
+        <select id="category">
+          <option value="">Seç...</option>
+          <option>T-Shirt</option>
+          <option>Mug / Bardak</option>
+          <option>Poster / Wall Art</option>
+          <option>Telefon Kılıfı</option>
+          <option>Battaniye</option>
+          <option>Hoodie</option>
+          <option>Tote Bag</option>
+          <option>Dijital Ürün</option>
+          <option>Crochet Pattern</option>
+          <option>Sticker</option>
+          <option>Diğer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Niş / Tema</label>
+        <input type="text" id="niche" placeholder="Örn: komik rakun, William Morris botanik, anime" />
+      </div>
+      <div class="form-group">
+        <label>Hedef Kitle</label>
+        <input type="text" id="audience" placeholder="Örn: 25-35 yaş kadınlar, anime hayranları" />
+      </div>
+      <div class="form-group">
+        <label>Ürün Fiyatı (USD)</label>
+        <input type="number" id="price" placeholder="24.99" step="0.01" min="0" />
+      </div>
+      <div class="form-group full">
+        <label>Mevcut Etsy Başlığın <span class="label-optional">(varsa)</span></label>
+        <input type="text" id="currentTitle" placeholder="Mevcut listing başlığını buraya yapıştır" />
+      </div>
+      <div class="form-group full">
+        <label>Mevcut Etiketlerin <span class="label-optional">(varsa)</span></label>
+        <input type="text" id="currentTags" placeholder="Virgülle ayır: funny mug, cat lover gift, coffee cup" />
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-next" onclick="goStep(2)">Devam Et →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="form-step" id="step2">
+    <div class="form-section-title">Ürün Fotoğrafları</div>
+    <div class="form-section-desc">1-5 adet ürün fotoğrafı yükle. Claude her fotoğrafı analiz edecek.</div>
+
+    <div class="photo-upload-area" onclick="document.getElementById('photoInput').click()">
+      <div class="upload-icon">📸</div>
+      <div class="upload-text">Fotoğraf yüklemek için tıkla veya sürükle bırak</div>
+      <div class="upload-sub">JPG, PNG — Maksimum 5 fotoğraf, her biri max 5MB</div>
+    </div>
+    <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(event)" />
+    <div class="photo-previews" id="photoPreviews"></div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(1)">← Geri</button>
+      <button class="btn-next" onclick="goStep(3)">Devam Et →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="form-step" id="step3">
+    <div class="form-section-title">Performans Metrikleri</div>
+    <div class="form-section-desc">Reklam ve satış verilerini gir. ROAS ve CTR analizi için kullanılacak. Yeni ürünse boş bırakabilirsin.</div>
+
+    <div class="new-product-note">💡 Ürün yeniyse veya verisi yoksa alanları boş bırak. "Yeni ürün" olarak değerlendirip başlangıç stratejisi önerilecek.</div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Aylık Reklam Harcaması (USD) <span class="label-optional">isteğe bağlı</span></label>
+        <input type="number" id="adSpend" placeholder="50" min="0" step="0.01" />
+      </div>
+      <div class="form-group">
+        <label>Aylık Satış Sayısı <span class="label-optional">isteğe bağlı</span></label>
+        <input type="number" id="monthlySales" placeholder="15" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Aylık Görüntülenme <span class="label-optional">isteğe bağlı</span></label>
+        <input type="number" id="views" placeholder="1200" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Aylık Favori Sayısı <span class="label-optional">isteğe bağlı</span></label>
+        <input type="number" id="favorites" placeholder="45" min="0" />
+      </div>
+      <div class="form-group">
+        <label>Ortalama CPC (USD) <span class="label-optional">isteğe bağlı</span></label>
+        <input type="number" id="cpc" placeholder="0.35" min="0" step="0.01" />
+      </div>
+      <div class="form-group">
+        <label>Printify / Üretim Maliyeti (USD) <span class="label-optional">isteğe bağlı</span></label>
+        <input type="number" id="costPrice" placeholder="8.50" min="0" step="0.01" />
+      </div>
+    </div>
+
+    <div class="metrics-note">ℹ️ Etsy komisyonu (%6.5 + $0.20 listeleme) otomatik hesaba katılacak.</div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(2)">← Geri</button>
+      <button class="btn-next" onclick="goStep(4)">Devam Et →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="form-step" id="step4">
+    <div class="form-section-title">Sorularını Sor</div>
+    <div class="form-section-desc">Merak ettiğin her şeyi yaz. Claude tüm sorularını cevaplayacak.</div>
+
+    <div class="form-grid single">
+      <div class="form-group">
+        <label>Soruların ve Ek Bilgiler</label>
+        <textarea id="extraQuestions" rows="6" placeholder="Örn: Rakiplerim çok ucuza satıyor, nasıl rekabet edeyim? / Bu niş doymuş mu? / Hangi mevsimde daha çok satar? / Fotoğraflarımın nesi eksik? / İlk haftada ne yapmalıyım?"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Rakip Mağaza Adları <span class="label-optional">isteğe bağlı</span></label>
+        <input type="text" id="competitors" placeholder="Virgülle ayır: CoolShop, AmazingStore" />
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="goStep(3)">← Geri</button>
+      <button class="btn-next" id="analyzeBtn" onclick="startAnalysis()">✦ Analizi Başlat</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="error-box" id="errorBox"></div>
+
+<div class="loading" id="loading">
+  <div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="loading-title">Analiz Yapılıyor</div>
+  <p>Claude ürününü inceliyor, bu 15-30 saniye sürebilir.</p>
+  <div class="loading-steps">
+    <div class="loading-step" id="ls1">⟳ Fotoğraflar inceleniyor...</div>
+    <div class="loading-step" id="ls2">⟳ SEO analizi yapılıyor...</div>
+    <div class="loading-step" id="ls3">⟳ Metrikler hesaplanıyor...</div>
+    <div class="loading-step" id="ls4">⟳ Öneriler hazırlanıyor...</div>
+    <div class="loading-step" id="ls5">⟳ Sorular yanıtlanıyor...</div>
+  </div>
+</div>
+
+<div class="results" id="results"></div>
+
+<footer>
+  Üye özel araç &nbsp;·&nbsp; <span>%1 Elit E-Ticaret Akademisi</span> &nbsp;·&nbsp; oguzulas.com
+</footer>
+
+<script>
+const CLAUDE_KEY = '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';
+const SUPABASE_URL = 'https://dorekladofsdrygucfeh.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvcmVrbGFkb2ZzZHJ5Z3VjZmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MjAxNTksImV4cCI6MjA5MTM5NjE1OX0.tQF4nS6P7LStsYnzaY2WGo-zBe6X1lDrrX1Hz82-X3Y';
+const MAX_MONTHLY = 10;
+
+let photos = [];
+let currentStep = 1;
+
+function getMonthYear() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+async function getUsage(email) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/usage_limits?user_email=eq.${encodeURIComponent(email)}&month_year=eq.${getMonthYear()}`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    return data.length > 0 ? data[0].analysis_count : 0;
+  } catch(e) { return 0; }
+}
+
+async function incrementUsage(email) {
+  const my = getMonthYear();
+  const current = await getUsage(email);
+  if (current === 0) {
+    await fetch(`${SUPABASE_URL}/rest/v1/usage_limits`, {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ user_email: email, month_year: my, analysis_count: 1 })
+    });
+  } else {
+    await fetch(`${SUPABASE_URL}/rest/v1/usage_limits?user_email=eq.${encodeURIComponent(email)}&month_year=eq.${my}`, {
+      method: 'PATCH',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ analysis_count: current + 1 })
+    });
+  }
+}
+
+async function updateUsageDisplay(email) {
+  try {
+    const count = await getUsage(email);
+    document.getElementById('usageCount').textContent = count;
+  } catch(e) {}
+}
+
+function goStep(n) {
+  const email = document.getElementById('userEmail').value.trim();
+  const category = document.getElementById('category').value;
+
+  if (n > 1 && (!email || !email.includes('@'))) { showError('Geçerli bir email adresi gir.'); return; }
+  if (n > 1 && !category) { showError('Ürün kategorisini seç.'); return; }
+  if (n > 1 && !document.getElementById('niche').value.trim()) { showError('Niş / tema alanını doldur.'); return; }
+
+  document.getElementById(`step${currentStep}`).classList.remove('active');
+  document.getElementById(`nav${currentStep}`).classList.remove('active');
+  document.getElementById(`nav${currentStep}`).classList.add('done');
+
+  currentStep = n;
+  document.getElementById(`step${n}`).classList.add('active');
+  document.getElementById(`nav${n}`).classList.remove('done');
+  document.getElementById(`nav${n}`).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function handlePhotos(event) {
+  const files = Array.from(event.target.files).slice(0, 5);
+  photos = [];
+  const previews = document.getElementById('photoPreviews');
+  previews.innerHTML = '';
+
+  files.forEach((file, i) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      photos[i] = e.target.result;
+      const div = document.createElement('div');
+      div.className = 'photo-preview';
+      div.innerHTML = `<img src="${e.target.result}" alt="Photo ${i+1}"><button class="photo-remove" onclick="removePhoto(${i})">×</button>`;
+      previews.appendChild(div);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removePhoto(index) {
+  photos.splice(index, 1);
+  const previews = document.getElementById('photoPreviews');
+  previews.children[index].remove();
+}
+
+function setLoadingStep(n) {
+  const texts = ['Fotoğraflar inceleniyor...', 'SEO analizi yapılıyor...', 'Metrikler hesaplanıyor...', 'Öneriler hazırlanıyor...', 'Sorular yanıtlanıyor...'];
+  for (let i = 1; i <= 5; i++) {
+    const el = document.getElementById(`ls${i}`);
+    if (i < n) { el.className = 'loading-step done'; el.textContent = `✓ ${texts[i-1]}`; }
+    else if (i === n) { el.className = 'loading-step active'; el.textContent = `⟳ ${texts[i-1]}`; }
+    else { el.className = 'loading-step'; el.textContent = `⟳ ${texts[i-1]}`; }
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 6000);
+}
+
+function sc(s) { return s >= 70 ? 'var(--green)' : s >= 40 ? 'var(--yellow)' : 'var(--red)'; }
+
+async function startAnalysis() {
+  const email = document.getElementById('userEmail').value.trim();
+
+  try {
+    const usage = await getUsage(email);
+    if (usage >= MAX_MONTHLY) { showError(`Bu ay ${MAX_MONTHLY} analiz hakkını kullandın.`); return; }
+  } catch(e) {}
+
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById(`step${currentStep}`).classList.remove('active');
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('errorBox').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Gather data
+  const data = {
+    category: document.getElementById('category').value,
+    niche: document.getElementById('niche').value,
+    audience: document.getElementById('audience').value,
+    price: parseFloat(document.getElementById('price').value) || null,
+    currentTitle: document.getElementById('currentTitle').value,
+    currentTags: document.getElementById('currentTags').value,
+    adSpend: parseFloat(document.getElementById('adSpend').value) || null,
+    monthlySales: parseInt(document.getElementById('monthlySales').value) || null,
+    views: parseInt(document.getElementById('views').value) || null,
+    favorites: parseInt(document.getElementById('favorites').value) || null,
+    cpc: parseFloat(document.getElementById('cpc').value) || null,
+    costPrice: parseFloat(document.getElementById('costPrice').value) || null,
+    extraQuestions: document.getElementById('extraQuestions').value,
+    competitors: document.getElementById('competitors').value,
+    photoCount: photos.length,
+    isNewProduct: !document.getElementById('monthlySales').value && !document.getElementById('views').value
+  };
+
+  // Calculate metrics
+  let calculatedMetrics = {};
+  if (data.price && data.costPrice && data.monthlySales) {
+    const etsyFee = data.price * 0.065 + 0.20;
+    const netRevenue = (data.price - data.costPrice - etsyFee) * data.monthlySales;
+    calculatedMetrics.monthlyRevenue = (data.price * data.monthlySales).toFixed(2);
+    calculatedMetrics.monthlyProfit = netRevenue.toFixed(2);
+    if (data.adSpend) calculatedMetrics.roas = (parseFloat(calculatedMetrics.monthlyRevenue) / data.adSpend).toFixed(2);
+  }
+  if (data.views && data.monthlySales) calculatedMetrics.convRate = ((data.monthlySales / data.views) * 100).toFixed(2);
+  if (data.favorites && data.views) calculatedMetrics.favRate = ((data.favorites / data.views) * 100).toFixed(2);
+  if (data.adSpend && data.cpc) calculatedMetrics.estimatedClicks = Math.round(data.adSpend / data.cpc);
+
+  setLoadingStep(1);
+  await new Promise(r => setTimeout(r, 300));
+
+  try {
+    // Build message content
+    const content = [];
+
+    // Add photos if any
+    if (photos.length > 0) {
+      photos.forEach((photo, i) => {
+        const base64 = photo.split(',')[1];
+        const mediaType = photo.split(';')[0].split(':')[1];
+        content.push({ type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } });
+        content.push({ type: 'text', text: `Fotoğraf ${i+1}/${photos.length}` });
+      });
+    }
+
+    setLoadingStep(2);
+
+    // Build prompt
+    const prompt = buildPrompt(data, calculatedMetrics);
+    content.push({ type: 'text', text: prompt });
+
+    setLoadingStep(3);
+
+    const aiRes = await fetch('/.netlify/functions/claude', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_KEY,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-5-20251001',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content }]
+      })
+    });
+
+    if (!aiRes.ok) {
+      const err = await aiRes.json();
+      throw new Error(err.error?.message || 'AI hatası');
+    }
+
+    setLoadingStep(4);
+    const aiData = await aiRes.json();
+    const clean = aiData.content[0].text.replace(/```json|```/g, '').trim();
+
+    setLoadingStep(5);
+    const analysis = JSON.parse(clean);
+
+    await incrementUsage(email);
+    await updateUsageDisplay(email);
+
+    document.getElementById('loading').style.display = 'none';
+    renderResults(data, calculatedMetrics, analysis);
+
+  } catch(err) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById(`step${currentStep}`).classList.add('active');
+    document.getElementById('analyzeBtn').disabled = false;
+    showError(err.message || 'Bir hata oluştu. Tekrar dene.');
+  }
+}
+
+function buildPrompt(data, metrics) {
+  const isNew = data.isNewProduct;
+
+  return `Sen Etsy'de 5+ yıl deneyimli, POD ve dijital ürün konusunda uzman bir e-ticaret danışmanısın. Türkçe yanıt ver.
+
+ÜRÜN BİLGİSİ:
+- Kategori: ${data.category}
+- Niş/Tema: ${data.niche}
+- Hedef Kitle: ${data.audience || 'Belirtilmedi'}
+- Fiyat: ${data.price ? '$' + data.price : 'Belirtilmedi'}
+- Mevcut Başlık: ${data.currentTitle || 'Yok'}
+- Mevcut Taglar: ${data.currentTags || 'Yok'}
+- Yüklenen Fotoğraf Sayısı: ${data.photoCount}
+- Rakipler: ${data.competitors || 'Belirtilmedi'}
+
+PERFORMANS METRİKLERİ:
+${isNew ? '⚠️ YENİ ÜRÜN — Henüz satış/görüntülenme verisi yok. Başlangıç stratejisi öner.' : `
+- Aylık Satış: ${data.monthlySales || 0}
+- Aylık Görüntülenme: ${data.views || 0}
+- Aylık Favori: ${data.favorites || 0}
+- Reklam Harcaması: ${data.adSpend ? '$' + data.adSpend : 'Yok'}
+- CPC: ${data.cpc ? '$' + data.cpc : 'Bilinmiyor'}
+- Üretim Maliyeti: ${data.costPrice ? '$' + data.costPrice : 'Bilinmiyor'}
+`}
+
+HESAPLANAN METRİKLER:
+${metrics.convRate ? `- Conversion Rate: %${metrics.convRate}` : ''}
+${metrics.favRate ? `- Favori Oranı: %${metrics.favRate}` : ''}
+${metrics.roas ? `- ROAS: ${metrics.roas}x` : ''}
+${metrics.monthlyProfit ? `- Aylık Net Kâr: $${metrics.monthlyProfit}` : ''}
+${metrics.estimatedClicks ? `- Tahmini Aylık Tıklama: ${metrics.estimatedClicks}` : ''}
+
+SATICI SORULARI:
+${data.extraQuestions || 'Soru yok'}
+
+${data.photoCount > 0 ? 'Yüklenen fotoğrafları detaylıca analiz et.' : 'Fotoğraf yüklenmedi, genel öneriler ver.'}
+
+Kesinlikle sadece şu JSON formatında yanıt ver, başka hiçbir şey yazma:
+{
+  "overall_score": 72,
+  "verdict": "Ürün hakkında 2-3 cümlelik kapsamlı değerlendirme",
+  "verdict_level": "good",
+  "strengths": ["güçlü yön 1", "güçlü yön 2"],
+  "weaknesses": ["zayıf yön 1", "zayıf yön 2"],
+  "photo_analysis": [
+    {
+      "photo_num": 1,
+      "positives": ["iyi yön 1", "iyi yön 2"],
+      "negatives": ["eksik 1", "eksik 2"],
+      "tip": "Bu fotoğraf için en önemli iyileştirme önerisi"
+    }
+  ],
+  "seo_titles": [
+    {"title": "SEO optimize başlık 1", "why": "Neden bu başlık iyi"},
+    {"title": "SEO optimize başlık 2", "why": "Neden bu başlık iyi"},
+    {"title": "SEO optimize başlık 3", "why": "Neden bu başlık iyi"}
+  ],
+  "tags": ["long-tail tag 1", "long-tail tag 2", "long-tail tag 3", "long-tail tag 4", "long-tail tag 5", "long-tail tag 6", "long-tail tag 7", "long-tail tag 8", "long-tail tag 9", "long-tail tag 10", "long-tail tag 11", "long-tail tag 12", "long-tail tag 13"],
+  "metrics_analysis": {
+    "ctr_verdict": "CTR hakkında değerlendirme",
+    "conv_verdict": "Conversion hakkında değerlendirme",
+    "roas_verdict": "ROAS hakkında değerlendirme — iyi mi kötü mü, neden",
+    "roas_tips": ["ROAS artırmak için somut öneri 1", "öneri 2", "öneri 3"]
+  },
+  "recommendations": [
+    {"priority": "high", "text": "En kritik öneri — somut ve uygulanabilir"},
+    {"priority": "high", "text": "İkinci kritik öneri"},
+    {"priority": "medium", "text": "Orta öncelikli öneri"},
+    {"priority": "low", "text": "Düşük öncelikli öneri"}
+  ],
+  "quick_wins": ["Bugün yapılabilecek adım 1", "adım 2", "adım 3"],
+  "qa_answers": [
+    {"question": "Satıcının sorusu", "answer": "Detaylı, somut cevap"}
+  ]
+}`;
+}
+
+function renderResults(data, metrics, a) {
+  const el = document.getElementById('results');
+  const ohex = a.overall_score >= 70 ? 'var(--green)' : a.overall_score >= 40 ? 'var(--yellow)' : 'var(--red)';
+
+  let metricsHTML = '';
+  if (metrics.roas || metrics.convRate || metrics.favRate || metrics.monthlyProfit) {
+    metricsHTML = `
+    <div class="metrics-row">
+      ${metrics.roas ? `<div class="metric-card"><div class="metric-label">ROAS</div><div class="metric-value" style="color:${parseFloat(metrics.roas)>=3?'var(--green)':parseFloat(metrics.roas)>=1?'var(--yellow)':'var(--red)'}">${metrics.roas}x</div><div class="metric-sub">Hedef: 3x+</div></div>` : ''}
+      ${metrics.convRate ? `<div class="metric-card"><div class="metric-label">Conversion</div><div class="metric-value" style="color:${parseFloat(metrics.convRate)>=3?'var(--green)':parseFloat(metrics.convRate)>=1?'var(--yellow)':'var(--red)'}">%${metrics.convRate}</div><div class="metric-sub">Hedef: %1-3</div></div>` : ''}
+      ${metrics.favRate ? `<div class="metric-card"><div class="metric-label">Favori Oranı</div><div class="metric-value" style="color:var(--gold)">%${metrics.favRate}</div><div class="metric-sub">Görüntülenme başına</div></div>` : ''}
+      ${metrics.monthlyProfit ? `<div class="metric-card"><div class="metric-label">Aylık Net Kâr</div><div class="metric-value" style="color:${parseFloat(metrics.monthlyProfit)>0?'var(--green)':'var(--red)'}">$${metrics.monthlyProfit}</div><div class="metric-sub">Reklam dahil</div></div>` : ''}
+    </div>`;
+  }
+
+  let photoHTML = '';
+  if (a.photo_analysis && a.photo_analysis.length > 0) {
+    photoHTML = `
+    <div class="analysis-section">
+      <div class="section-header"><div class="section-icon">📸</div><div class="section-title">Fotoğraf Analizi</div></div>
+      <div class="section-body">
+        ${a.photo_analysis.map(p => `
+          <div class="photo-feedback">
+            <div class="photo-feedback-title">Fotoğraf ${p.photo_num}</div>
+            <div class="photo-feedback-items">
+              ${(p.positives||[]).map(x=>`<div class="fb-item good">✓ ${x}</div>`).join('')}
+              ${(p.negatives||[]).map(x=>`<div class="fb-item bad">✗ ${x}</div>`).join('')}
+              ${p.tip ? `<div class="fb-item tip">→ ${p.tip}</div>` : ''}
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }
+
+  let metricsAnalysisHTML = '';
+  if (a.metrics_analysis) {
+    const m = a.metrics_analysis;
+    metricsAnalysisHTML = `
+    <div class="analysis-section">
+      <div class="section-header"><div class="section-icon">📊</div><div class="section-title">CTR / ROAS / Conversion Analizi</div></div>
+      <div class="section-body">
+        <div class="roas-calc">
+          ${m.ctr_verdict ? `<div class="item"><div class="item-icon">📈</div><div class="item-text"><strong>CTR:</strong> ${m.ctr_verdict}</div></div>` : ''}
+          ${m.conv_verdict ? `<div class="item"><div class="item-icon">🛒</div><div class="item-text"><strong>Conversion:</strong> ${m.conv_verdict}</div></div>` : ''}
+          ${m.roas_verdict ? `<div class="item" style="margin-top:8px"><div class="item-icon">💰</div><div class="item-text"><strong>ROAS:</strong> ${m.roas_verdict}</div></div>` : ''}
+          ${m.roas_tips && m.roas_tips.length > 0 ? `
+            <div class="roas-divider"></div>
+            <div style="font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">ROAS Artırma Önerileri</div>
+            ${m.roas_tips.map(t=>`<div class="item"><div class="item-icon" style="color:var(--gold)">→</div><div class="item-text">${t}</div></div>`).join('')}
+          ` : ''}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  let qaHTML = '';
+  if (a.qa_answers && a.qa_answers.length > 0) {
+    qaHTML = `
+    <div class="analysis-section">
+      <div class="section-header"><div class="section-icon">❓</div><div class="section-title">Sorularının Yanıtları</div></div>
+      <div class="section-body">
+        ${a.qa_answers.map(qa=>`
+          <div class="qa-item">
+            <div class="qa-q">Soru: ${qa.question}</div>
+            <div class="qa-a">${qa.answer}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }
+
+  el.innerHTML = `
+    <div class="score-header">
+      <div class="score-circle" style="border-color:${ohex}">
+        <div class="score-num" style="color:${ohex}">${a.overall_score}</div>
+        <div class="score-lbl">/ 100</div>
+      </div>
+      <div class="score-info">
+        <div class="score-product">${data.niche} — ${data.category}</div>
+        <div class="score-verdict" style="color:${ohex}">${a.verdict}</div>
+        <div class="score-tags">
+          ${(a.strengths||[]).map(s=>`<span class="score-tag green">✓ ${s}</span>`).join('')}
+          ${(a.weaknesses||[]).map(w=>`<span class="score-tag red">✗ ${w}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    ${metricsHTML}
+
+    <div class="analysis-section">
+      <div class="section-header"><div class="section-icon">⚡</div><div class="section-title">Hızlı Kazanımlar — Bugün Yapabileceklerin</div></div>
+      <div class="section-body">
+        ${(a.quick_wins||[]).map(w=>`<div class="item"><div class="item-icon" style="color:var(--gold)">→</div><div class="item-text">${w}</div></div>`).join('')}
+      </div>
+    </div>
+
+    ${photoHTML}
+
+    <div class="analysis-section">
+      <div class="section-header"><div class="section-icon">📝</div><div class="section-title">SEO Başlık Önerileri</div></div>
+      <div class="section-body">
+        ${(a.seo_titles||[]).map((t,i)=>`
+          <div class="title-option">
+            <div>
+              <div class="title-text">${t.title}</div>
+              <div style="font-size:11px;color:var(--gray);margin-top:4px">${t.why}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+              <div class="title-len">${t.title.length}/140</div>
+              <button class="copy-btn" onclick="copyTitle('${t.title.replace(/'/g,"\\'")}', this)">Kopyala</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="analysis-section">
+      <div class="section-header"><div class="section-icon">🏷️</div><div class="section-title">13 Long-Tail Tag Önerisi</div><button class="copy-btn" style="margin-left:auto" onclick="copyAllTags(this)">Tümünü Kopyala</button></div>
+      <div class="section-body">
+        <div class="tags-container" id="tagsContainer">
+          ${(a.tags||[]).map(t=>`<div class="tag-chip" onclick="copyTag('${t.replace(/'/g,"\\'")}', this)">${t}</div>`).join('')}
+        </div>
+        <div style="font-size:11px;color:var(--gray);margin-top:8px">Tag'e tıklayarak kopyala</div>
+      </div>
+    </div>
+
+    ${metricsAnalysisHTML}
+
+    <div class="analysis-section">
+      <div class="section-header"><div class="section-icon">📋</div><div class="section-title">Öncelikli Öneriler</div></div>
+      <div class="section-body">
+        ${(a.recommendations||[]).map(r=>`
+          <div class="rec-item">
+            <div class="rec-priority ${r.priority}">${r.priority==='high'?'🔴 Yüksek Öncelik':r.priority==='medium'?'🟡 Orta Öncelik':'🟢 Düşük Öncelik'}</div>
+            <div class="rec-text">${r.text}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    ${qaHTML}
+
+    <div class="disclaimer">Bu analiz girilen bilgilere ve fotoğraflara dayanmaktadır. Gerçek Etsy algoritması farklı faktörler kullanabilir. Daha derin analiz için %1 Elit Akademi danışmanlık hizmetinden yararlanabilirsin.</div>
+    <button class="new-btn" onclick="resetForm()">← Yeni Analiz Yap</button>
+  `;
+
+  el.style.display = 'block';
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function copyTitle(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Kopyalandı ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopyala'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function copyTag(tag, el) {
+  navigator.clipboard.writeText(tag).then(() => {
+    const orig = el.style.background;
+    el.style.background = 'rgba(46,204,113,0.2)';
+    el.style.color = 'var(--green)';
+    setTimeout(() => { el.style.background = ''; el.style.color = ''; }, 1500);
+  });
+}
+
+function copyAllTags(btn) {
+  const tags = document.querySelectorAll('.tag-chip');
+  const text = Array.from(tags).map(t => t.textContent).join(', ');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Kopyalandı ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Tümünü Kopyala'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function resetForm() {
+  document.getElementById('results').style.display = 'none';
+  currentStep = 1;
+  document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.step-nav-item').forEach(n => { n.classList.remove('active','done'); });
+  document.getElementById('step1').classList.add('active');
+  document.getElementById('nav1').classList.add('active');
+  document.getElementById('analyzeBtn').disabled = false;
+  photos = [];
+  document.getElementById('photoPreviews').innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+window.addEventListener('load', async () => {
+  const saved = localStorage.getItem('userEmail');
+  if (saved) { document.getElementById('userEmail').value = saved; await updateUsageDisplay(saved); }
+});
+document.getElementById('userEmail').addEventListener('blur', async function() {
+  if (this.value.includes('@')) { localStorage.setItem('userEmail', this.value); await updateUsageDisplay(this.value); }
+});
+</script>
+</body>
+</html>
