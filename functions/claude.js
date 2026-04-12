@@ -17,7 +17,7 @@ exports.handler = async (event) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': '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',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify(body)
@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     const text = await response.text();
     return {
       statusCode: response.status,
-      headers: { 
+      headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
       },
