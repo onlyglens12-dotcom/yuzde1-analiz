@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Winner Ürün Üretici — %1 Elit Akademi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #D4AF37; --black: #0A0A0A; --dark: #111111; --card: #141414;
+  --border: rgba(212,175,55,0.15); --border-strong: rgba(212,175,55,0.4);
+  --white: #F0EAD6; --gray: #888888; --gray-dim: #333333;
+  --green: #2ECC71; --green-bg: rgba(46,204,113,0.1);
+  --red: #E74C3C; --red-bg: rgba(231,76,60,0.1);
+  --yellow: #F39C12; --yellow-bg: rgba(243,156,18,0.1);
+  --blue: #3498DB; --blue-bg: rgba(52,152,219,0.1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
+
+header { background: var(--dark); border-bottom: 0.5px solid var(--border); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+.logo { font-family: 'Playfair Display', serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
+.usage-badge { font-size: 11px; color: var(--gray); border: 0.5px solid var(--border); padding: 4px 12px; border-radius: 2px; }
+.usage-count { color: var(--gold); font-weight: 600; }
+
+.hero { text-align: center; padding: 48px 24px 36px; max-width: 720px; margin: 0 auto; }
+.hero-tag { display: inline-block; border: 0.5px solid var(--border-strong); color: var(--gold); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 5px 16px; border-radius: 2px; margin-bottom: 16px; }
+.hero h1 { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; color: var(--white); line-height: 1.2; margin-bottom: 10px; }
+.hero h1 span { color: var(--gold); }
+.hero p { font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+.form-wrap { max-width: 720px; margin: 0 auto; padding: 0 24px 40px; }
+.section-title { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--gold); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 0.5px solid var(--border); }
+
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+.opt { font-size: 10px; color: var(--gray); font-weight: 400; letter-spacing: 0; text-transform: none; margin-left: 4px; }
+input[type="email"], select { background: var(--card); border: 0.5px solid var(--border); border-radius: 2px; padding: 12px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--white); outline: none; transition: border-color 0.2s; width: 100%; }
+input:focus, select:focus { border-color: var(--border-strong); }
+input::placeholder { color: var(--gray); }
+select option { background: #1a1a1a; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.photo-area { border: 1.5px dashed var(--border-strong); border-radius: 4px; padding: 40px 28px; text-align: center; cursor: pointer; background: var(--card); transition: all 0.2s; margin-bottom: 14px; }
+.photo-area:hover { border-color: var(--gold); background: rgba(212,175,55,0.04); }
+.photo-area.has-photo { border-color: var(--green); border-style: solid; }
+.upload-icon { font-size: 32px; margin-bottom: 10px; }
+.upload-text { font-size: 15px; color: var(--white); margin-bottom: 4px; font-weight: 500; }
+.upload-sub { font-size: 12px; color: var(--gray); }
+#photoInput { display: none; }
+.preview-img { max-width: 100%; max-height: 240px; border-radius: 4px; margin-top: 12px; border: 0.5px solid var(--border); }
+
+.prod-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.prod-type-btn { background: var(--card); border: 0.5px solid var(--border); border-radius: 2px; padding: 10px 8px; text-align: center; cursor: pointer; transition: all 0.2s; font-size: 11px; color: var(--gray); }
+.prod-type-btn:hover { border-color: var(--border-strong); color: var(--white); }
+.prod-type-btn.active { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.06); }
+.prod-type-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+
+.note { background: var(--yellow-bg); border: 0.5px solid rgba(243,156,18,0.3); border-radius: 4px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: var(--yellow); line-height: 1.6; }
+
+.submit-btn { width: 100%; background: var(--gold); color: var(--black); border: none; border-radius: 2px; padding: 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s; margin-top: 24px; }
+.submit-btn:hover { opacity: 0.88; }
+.submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.error-box { background: var(--red-bg); border: 0.5px solid rgba(231,76,60,0.4); border-radius: 4px; padding: 14px 18px; margin-bottom: 16px; font-size: 13px; color: var(--red); text-align: center; display: none; }
+
+.loading { display: none; text-align: center; padding: 60px 24px; max-width: 640px; margin: 0 auto; }
+.dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 16px; }
+.dot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; animation: pulse 1.4s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1} }
+.loading h2 { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--gold); margin-bottom: 8px; }
+.loading p { font-size: 13px; color: var(--gray); }
+.loading-steps { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; max-width: 320px; margin-left: auto; margin-right: auto; }
+.ls { font-size: 12px; color: var(--gray); text-align: left; padding: 8px 12px; background: var(--card); border: 0.5px solid var(--border); border-radius: 2px; }
+.ls.active { color: var(--gold); border-color: var(--border-strong); }
+
+.results { display: none; max-width: 960px; margin: 0 auto; padding: 0 24px 80px; }
+
+.section { background: var(--card); border: 0.5px solid var(--border); border-radius: 4px; margin-bottom: 16px; overflow: hidden; }
+.section-head { padding: 14px 20px; border-bottom: 0.5px solid var(--border); background: rgba(212,175,55,0.04); display: flex; align-items: center; gap: 10px; }
+.section-icon { font-size: 15px; }
+.section-ttl { font-size: 13px; font-weight: 600; color: var(--gold); flex: 1; }
+.section-body { padding: 20px; font-size: 13px; color: rgba(240,234,214,0.85); line-height: 1.8; white-space: pre-line; }
+
+.product-cards { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
+.product-card { background: var(--card); border: 0.5px solid var(--border); border-radius: 4px; overflow: hidden; }
+.pc-header { padding: 16px 20px; background: rgba(212,175,55,0.06); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.pc-num { font-size: 10px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+.pc-score { display: flex; align-items: center; gap: 8px; }
+.pc-score-val { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+.pc-score-lbl { font-size: 10px; color: var(--gray); }
+.pc-body { padding: 20px; }
+.pc-section { margin-bottom: 16px; }
+.pc-section:last-child { margin-bottom: 0; }
+.pc-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+.pc-content { font-size: 13px; color: rgba(240,234,214,0.85); line-height: 1.7; }
+.tag-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.tchip { background: rgba(212,175,55,0.08); border: 0.5px solid var(--border-strong); color: var(--gold); font-size: 11px; padding: 4px 12px; border-radius: 2px; cursor: pointer; transition: all 0.2s; }
+.tchip:hover { background: rgba(212,175,55,0.18); }
+
+.profit-box { background: rgba(46,204,113,0.06); border: 0.5px solid rgba(46,204,113,0.25); border-radius: 4px; padding: 14px 16px; margin-top: 10px; }
+.profit-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 12px; }
+.profit-row:last-child { margin-bottom: 0; border-top: 0.5px solid rgba(46,204,113,0.2); padding-top: 6px; margin-top: 6px; }
+.profit-label { color: var(--gray); }
+.profit-value { color: var(--green); font-weight: 600; }
+.profit-warning { font-size: 11px; color: var(--yellow); margin-top: 8px; padding-top: 8px; border-top: 0.5px solid rgba(243,156,18,0.2); }
+
+.how-to { background: rgba(52,152,219,0.06); border: 0.5px solid rgba(52,152,219,0.2); border-radius: 4px; padding: 14px 16px; margin-top: 10px; }
+.how-to-step { display: flex; gap: 10px; margin-bottom: 8px; font-size: 12px; line-height: 1.6; }
+.how-to-step:last-child { margin-bottom: 0; }
+.step-num { width: 20px; height: 20px; background: rgba(52,152,219,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--blue); flex-shrink: 0; font-weight: 600; }
+.step-text { color: rgba(240,234,214,0.8); }
+.step-highlight { color: var(--blue); font-weight: 500; }
+
+.badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.badge { font-size: 11px; padding: 4px 12px; border-radius: 2px; }
+.badge-go { background: var(--green-bg); color: var(--green); border: 0.5px solid rgba(46,204,113,0.3); }
+.badge-test { background: var(--yellow-bg); color: var(--yellow); border: 0.5px solid rgba(243,156,18,0.3); }
+.badge-skip { background: var(--red-bg); color: var(--red); border: 0.5px solid rgba(231,76,60,0.3); }
+.badge-comp { font-size: 11px; padding: 4px 12px; border-radius: 2px; background: var(--blue-bg); color: var(--blue); border: 0.5px solid rgba(52,152,219,0.3); }
+
+.cbtn { font-size: 10px; color: var(--gray); background: none; border: 0.5px solid var(--border); padding: 3px 10px; border-radius: 2px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+.cbtn:hover { border-color: var(--gold); color: var(--gold); }
+.cbtn.ok { border-color: var(--green); color: var(--green); }
+
+.reset-btn { display: block; width: 100%; text-align: center; background: none; border: 0.5px solid var(--border); color: var(--gray); padding: 14px; border-radius: 2px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; margin-top: 20px; transition: all 0.2s; }
+.reset-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+footer { text-align: center; padding: 28px; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--gray); }
+footer span { color: var(--gold); }
+
+@media (max-width: 640px) {
+  .grid2 { grid-template-columns: 1fr; }
+  .prod-type-grid { grid-template-columns: repeat(2, 1fr); }
+  header { padding: 0 16px; }
+  .hero h1 { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">%1 Elit E-Ticaret</div>
+  <div class="usage-badge">Bu ay: <span class="usage-count" id="usageCount">?</span>/15 analiz</div>
+</header>
+
+<section class="hero">
+  <div class="hero-tag">Üye Özel Araç</div>
+  <h1>Winner Ürün <span>Üretici</span></h1>
+  <p>Rakip ürünün ekran görüntüsünü yapıştır — AI analiz eder, 3 özgün ürün konsepti üretir, tam listing hazırlar, nasıl yapacağını adım adım anlatır.</p>
+</section>
+
+<div class="form-wrap" id="formWrap">
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="section-title">1. Giriş Bilgileri</div>
+  <div class="grid2">
+    <div class="field"><label>Email Adresin</label><input type="email" id="userEmail" placeholder="ornek@gmail.com"/></div>
+    <div class="field"><label>Mağaza Türün</label>
+      <select id="storeType">
+        <option value="both">POD + Dijital Ürün</option>
+        <option value="pod">Sadece POD</option>
+        <option value="digital">Sadece Dijital Ürün</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section-title">2. Rakip Ürün Ekran Görüntüsü</div>
+  <div class="note">💡 Etsy'de beğendiğin veya çok satan bir ürünün ekran görüntüsünü yükle. AI analiz edip sana özgün alternatifler üretecek.</div>
+  <div class="photo-area" id="photoArea" onclick="document.getElementById('photoInput').click()">
+    <div class="upload-icon">📸</div>
+    <div class="upload-text">Ekran görüntüsü yüklemek için tıkla</div>
+    <div class="upload-sub">JPG, PNG — Etsy ürün sayfası ekran görüntüsü</div>
+    <img id="previewImg" class="preview-img" style="display:none"/>
+  </div>
+  <input type="file" id="photoInput" accept="image/*" onchange="handlePhoto(event)"/>
+
+  <div class="section-title">3. Hedef Ürün Tipi <span style="font-size:13px;font-weight:400;color:var(--gray)">isteğe bağlı</span></div>
+  <div class="prod-type-grid" id="prodTypeGrid">
+    <div class="prod-type-btn active" data-type="auto" onclick="selectType(this)"><span class="prod-type-icon">🤖</span>Otomatik</div>
+    <div class="prod-type-btn" data-type="tshirt" onclick="selectType(this)"><span class="prod-type-icon">👕</span>T-Shirt</div>
+    <div class="prod-type-btn" data-type="mug" onclick="selectType(this)"><span class="prod-type-icon">☕</span>Mug</div>
+    <div class="prod-type-btn" data-type="poster" onclick="selectType(this)"><span class="prod-type-icon">🖼️</span>Poster</div>
+    <div class="prod-type-btn" data-type="digital" onclick="selectType(this)"><span class="prod-type-icon">📄</span>Dijital PDF</div>
+    <div class="prod-type-btn" data-type="phone" onclick="selectType(this)"><span class="prod-type-icon">📱</span>Telefon Kılıfı</div>
+  </div>
+
+  <button class="submit-btn" id="submitBtn" onclick="startAnalysis()">✦ Winner Ürün Üret</button>
+</div>
+
+<div class="loading" id="loading">
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <h2>Analiz Yapılıyor</h2>
+  <p>AI ürünü inceliyor ve özgün konseptler üretiyor...</p>
+  <div class="loading-steps">
+    <div class="ls active" id="ls1">🔍 Ürün analiz ediliyor...</div>
+    <div class="ls" id="ls2">🧠 Psikoloji inceleniyor...</div>
+    <div class="ls" id="ls3">💡 Yeni konseptler üretiliyor...</div>
+    <div class="ls" id="ls4">📝 Listing hazırlanıyor...</div>
+    <div class="ls" id="ls5">💰 Kâr hesaplanıyor...</div>
+  </div>
+</div>
+
+<div class="results" id="results"></div>
+
+<footer>Üye özel araç &nbsp;·&nbsp; <span>%1 Elit E-Ticaret Akademisi</span> &nbsp;·&nbsp; oguzulas.com</footer>
+
+<script>
+const SUPABASE_URL='https://dorekladofsdrygucfeh.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvcmVrbGFkb2ZzZHJ5Z3VjZmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU4MjAxNTksImV4cCI6MjA5MTM5NjE1OX0.tQF4nS6P7LStsYnzaY2WGo-zBe6X1lDrrX1Hz82-X3Y';
+const MAX=15;
+let photoData=null;
+let selectedType='auto';
+let loadingInterval=null;
+
+function getMonthYear(){const d=new Date();return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+
+async function getUsage(email){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/usage_limits?user_email=eq.${encodeURIComponent(email)}&month_year=eq.${getMonthYear()}`,{headers:{'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`}});
+    const d=await r.json();return d.length>0?d[0].analysis_count:0;
+  }catch(e){return 0}
+}
+
+async function incrementUsage(email){
+  const my=getMonthYear(),cur=await getUsage(email);
+  const h={'apikey':SUPABASE_KEY,'Authorization':`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json'};
+  if(cur===0)await fetch(`${SUPABASE_URL}/rest/v1/usage_limits`,{method:'POST',headers:{...h,'Prefer':'return=minimal'},body:JSON.stringify({user_email:email,month_year:my,analysis_count:1})});
+  else await fetch(`${SUPABASE_URL}/rest/v1/usage_limits?user_email=eq.${encodeURIComponent(email)}&month_year=eq.${my}`,{method:'PATCH',headers:h,body:JSON.stringify({analysis_count:cur+1})});
+}
+
+async function updateUsage(email){
+  try{document.getElementById('usageCount').textContent=await getUsage(email)}catch(e){}
+}
+
+function showError(msg){
+  const el=document.getElementById('errorBox');
+  el.textContent=msg;el.style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>el.style.display='none',6000);
+}
+
+function handlePhoto(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    photoData=ev.target.result;
+    const img=document.getElementById('previewImg');
+    img.src=photoData;
+    img.style.display='block';
+    document.getElementById('photoArea').classList.add('has-photo');
+    document.querySelector('.upload-text').textContent='Fotoğraf yüklendi ✓';
+    document.querySelector('.upload-sub').textContent='Değiştirmek için tekrar tıkla';
+  };
+  r.readAsDataURL(file);
+}
+
+function selectType(el){
+  document.querySelectorAll('.prod-type-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  selectedType=el.dataset.type;
+}
+
+function startLoadingAnimation(){
+  const steps=['ls1','ls2','ls3','ls4','ls5'];
+  let i=0;
+  steps.forEach(s=>document.getElementById(s).classList.remove('active'));
+  document.getElementById('ls1').classList.add('active');
+  loadingInterval=setInterval(()=>{
+    i++;
+    if(i<steps.length){
+      document.getElementById(steps[i-1]).classList.remove('active');
+      document.getElementById(steps[i]).classList.add('active');
+    }
+  },4000);
+}
+
+function stopLoadingAnimation(){
+  if(loadingInterval)clearInterval(loadingInterval);
+}
+
+function gv(id){return document.getElementById(id).value.trim()}
+
+function calcProfit(price,type){
+  let cost=0,label='';
+  if(type==='tshirt'){cost=12.50;label='Bella Canvas 3001 (Printify)'}
+  else if(type==='mug'){cost=9.00;label='11oz Mug (Printify)'}
+  else if(type==='poster'){cost=6.50;label='Poster Print (Printify)'}
+  else if(type==='phone'){cost=11.00;label='Telefon Kılıfı (Printify)'}
+  else if(type==='digital'){cost=0;label='Dijital Ürün'}
+  else{cost=10.00;label='Ortalama POD ürün'}
+  
+  const listing=0.20;
+  const etsy=price*0.065;
+  const transaction=price*0.03;
+  const total_fees=listing+etsy+transaction;
+  const profit=price-cost-total_fees;
+  const profit_ads=price-cost-total_fees-(price*0.15);
+  
+  return{cost,label,listing,etsy,transaction,total_fees,profit,profit_ads}
+}
+
+async function startAnalysis(){
+  const email=gv('userEmail');
+  if(!email||!email.includes('@')){showError('Geçerli bir email adresi gir.');return}
+  if(!photoData){showError('Lütfen bir ürün ekran görüntüsü yükle.');return}
+
+  try{
+    const usage=await getUsage(email);
+    if(usage>=MAX){showError(`Bu ay ${MAX} analiz hakkını kullandın.`);return}
+  }catch(e){}
+
+  document.getElementById('submitBtn').disabled=true;
+  document.getElementById('formWrap').style.display='none';
+  document.getElementById('loading').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+  startLoadingAnimation();
+
+  const storeType=gv('storeType');
+  const prodType=selectedType==='auto'?'otomatik belirle':selectedType;
+
+  const prompt=`You are an elite Etsy product strategist and conversion-focused e-commerce expert working with Turkish Etsy sellers.
+
+Analyze the provided product screenshot and generate a complete analysis in TURKISH.
+
+Store type: ${storeType}
+Preferred product type: ${prodType}
+
+PROVIDE YOUR ANALYSIS WITH THESE EXACT MARKERS:
+
+[ANALYSIS]
+Ürün tipi, görünen yazılar, tasarım stili, hedef kitle, niş - kısa analiz
+
+[PSYCHOLOGY]
+Neden satın alınıyor? Hangi duygusal tetikleyici kullanılıyor?
+
+[NEW_SLOGANS]
+1. slogan 1
+2. slogan 2
+3. slogan 3
+4. slogan 4
+5. slogan 5
+
+[PRODUCT_1_NAME]
+Ürün adı ve konsept açıklaması
+
+[PRODUCT_1_TYPE]
+tshirt veya mug veya poster veya digital veya phone
+
+[PRODUCT_1_DESIGN]
+Kittl veya Canva için tasarım prompt'u (İngilizce) ve nasıl yapılacağı adım adım
+
+[PRODUCT_1_TITLE]
+SEO optimize Etsy başlığı (max 140 karakter)
+
+[PRODUCT_1_TAGS]
+tag1, tag2, tag3, tag4, tag5, tag6, tag7, tag8, tag9, tag10, tag11, tag12, tag13
+
+[PRODUCT_1_DESC]
+Dönüşüm odaklı Etsy açıklaması
+
+[PRODUCT_1_PRICE]
+Önerilen fiyat sadece sayı olarak (örnek: 24.99)
+
+[PRODUCT_1_SCORE]
+Satış potansiyeli 1-10 arası sadece sayı
+
+[PRODUCT_1_COMPETITION]
+Düşük veya Orta veya Yüksek
+
+[PRODUCT_1_DECISION]
+Git veya Test Et veya Geç
+
+[PRODUCT_2_NAME]
+Ürün adı ve konsept açıklaması
+
+[PRODUCT_2_TYPE]
+tshirt veya mug veya poster veya digital veya phone
+
+[PRODUCT_2_DESIGN]
+Kittl veya Canva için tasarım prompt'u (İngilizce) ve nasıl yapılacağı adım adım
+
+[PRODUCT_2_TITLE]
+SEO optimize Etsy başlığı (max 140 karakter)
+
+[PRODUCT_2_TAGS]
+tag1, tag2, tag3, tag4, tag5, tag6, tag7, tag8, tag9, tag10, tag11, tag12, tag13
+
+[PRODUCT_2_DESC]
+Dönüşüm odaklı Etsy açıklaması
+
+[PRODUCT_2_PRICE]
+Önerilen fiyat sadece sayı olarak
+
+[PRODUCT_2_SCORE]
+Satış potansiyeli 1-10 arası sadece sayı
+
+[PRODUCT_2_COMPETITION]
+Düşük veya Orta veya Yüksek
+
+[PRODUCT_2_DECISION]
+Git veya Test Et veya Geç
+
+[PRODUCT_3_NAME]
+Ürün adı ve konsept açıklaması
+
+[PRODUCT_3_TYPE]
+tshirt veya mug veya poster veya digital veya phone
+
+[PRODUCT_3_DESIGN]
+Kittl veya Canva için tasarım prompt'u (İngilizce) ve nasıl yapılacağı adım adım
+
+[PRODUCT_3_TITLE]
+SEO optimize Etsy başlığı (max 140 karakter)
+
+[PRODUCT_3_TAGS]
+tag1, tag2, tag3, tag4, tag5, tag6, tag7, tag8, tag9, tag10, tag11, tag12, tag13
+
+[PRODUCT_3_DESC]
+Dönüşüm odaklı Etsy açıklaması
+
+[PRODUCT_3_PRICE]
+Önerilen fiyat sadece sayı olarak
+
+[PRODUCT_3_SCORE]
+Satış potansiyeli 1-10 arası sadece sayı
+
+[PRODUCT_3_COMPETITION]
+Düşük veya Orta veya Yüksek
+
+[PRODUCT_3_DECISION]
+Git veya Test Et veya Geç`;
+
+  try{
+    const res=await fetch('/.netlify/functions/claude',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:2000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:photoData.split(';')[0].split(':')[1],data:photoData.split(',')[1]}},
+          {type:'text',text:prompt}
+        ]}]
+      })
+    });
+
+    if(!res.ok)throw new Error(`Sunucu hatası: ${res.status}`);
+    const aiData=await res.json();
+    if(aiData.error)throw new Error(aiData.error.message||'AI hatası');
+    const text=aiData.content[0].text;
+
+    await incrementUsage(email);
+    await updateUsage(email);
+    stopLoadingAnimation();
+    document.getElementById('loading').style.display='none';
+    renderResults(text);
+
+  }catch(err){
+    stopLoadingAnimation();
+    document.getElementById('loading').style.display='none';
+    document.getElementById('formWrap').style.display='block';
+    document.getElementById('submitBtn').disabled=false;
+    showError(err.message||'Bir hata oluştu. Tekrar dene.');
+  }
+}
+
+function extract(text,marker){
+  const start=text.indexOf(`[${marker}]`);
+  if(start===-1)return'';
+  const after=text.indexOf('\n',start)+1;
+  const nextMarker=text.indexOf('\n[',after);
+  const end=nextMarker===-1?text.length:nextMarker;
+  return text.substring(after,end).trim();
+}
+
+function scoreColor(s){
+  const n=parseInt(s)||5;
+  return n>=8?'var(--green)':n>=6?'var(--yellow)':'var(--red)';
+}
+
+function decisionBadge(d){
+  if(d.includes('Git'))return`<span class="badge badge-go">✓ Git</span>`;
+  if(d.includes('Test'))return`<span class="badge badge-test">~ Test Et</span>`;
+  return`<span class="badge badge-skip">✗ Geç</span>`;
+}
+
+function compBadge(c){
+  return`<span class="badge badge-comp">Rekabet: ${c}</span>`;
+}
+
+function howToSteps(design,type){
+  const steps=[];
+  if(type==='tshirt'||type==='mug'||type==='poster'||type==='phone'){
+    steps.push({n:1,text:`<span class="step-highlight">Kittl.com</span>'a git → Yeni tasarım oluştur → AI prompt kutusuna şunu yaz: <em>${design.substring(0,120)}</em>`});
+    steps.push({n:2,text:`Tasarımı PNG olarak indir (transparent background)`});
+    steps.push({n:3,text:`<span class="step-highlight">Printify</span>'a git → ${type==='tshirt'?'Bella Canvas 3001':type==='mug'?'11oz White Mug':type==='poster'?'Premium Poster':'Phone Case'} seç → Tasarımı yükle`});
+    steps.push({n:4,text:`Mockup oluştur → Etsy'de listing aç → Başlık ve tag'leri yapıştır`});
+  }else if(type==='digital'){
+    steps.push({n:1,text:`<span class="step-highlight">Canva</span>'yı aç → A4 boyut seç → Şu stilde bir şablon ara: ${design.substring(0,80)}`});
+    steps.push({n:2,text:`İçeriği ekle → Tüm sayfaları tamamla`});
+    steps.push({n:3,text:`Download → PDF Print seçeneğiyle indir`});
+    steps.push({n:4,text:`Etsy'de Digital Download olarak yükle → Listing aç`});
+  }
+  return steps.map(s=>`<div class="how-to-step"><div class="step-num">${s.n}</div><div class="step-text">${s.text}</div></div>`).join('');
+}
+
+function renderProduct(text,num){
+  const n=num;
+  const name=extract(text,`PRODUCT_${n}_NAME`);
+  const type=extract(text,`PRODUCT_${n}_TYPE`).toLowerCase().trim();
+  const design=extract(text,`PRODUCT_${n}_DESIGN`);
+  const title=extract(text,`PRODUCT_${n}_TITLE`);
+  const tagsRaw=extract(text,`PRODUCT_${n}_TAGS`);
+  const tags=tagsRaw.split(',').map(t=>t.trim()).filter(t=>t);
+  const desc=extract(text,`PRODUCT_${n}_DESC`);
+  const priceStr=extract(text,`PRODUCT_${n}_PRICE`);
+  const price=parseFloat(priceStr)||24.99;
+  const score=extract(text,`PRODUCT_${n}_SCORE`);
+  const competition=extract(text,`PRODUCT_${n}_COMPETITION`);
+  const decision=extract(text,`PRODUCT_${n}_DECISION`);
+
+  const p=calcProfit(price,type);
+
+  return`<div class="product-card">
+    <div class="pc-header">
+      <div class="pc-num">Konsept ${n}</div>
+      <div class="pc-score">
+        <div class="pc-score-val" style="color:${scoreColor(score)}">${score}/10</div>
+        <div class="pc-score-lbl">Satış Potansiyeli</div>
+      </div>
+    </div>
+    <div class="pc-body">
+      <div class="pc-section">
+        <div class="pc-label">Ürün Konsepti</div>
+        <div class="pc-content">${name}</div>
+        <div class="badge-row">${decisionBadge(decision)} ${compBadge(competition)}</div>
+      </div>
+      <div class="pc-section">
+        <div class="pc-label">Nasıl Yaparsın — Adım Adım</div>
+        <div class="how-to">${howToSteps(design,type)}</div>
+      </div>
+      <div class="pc-section">
+        <div class="pc-label">SEO Başlık <button class="cbtn" onclick="copyText('${title.replace(/'/g,"\\'")}',this)" style="margin-left:8px">Kopyala</button></div>
+        <div class="pc-content" style="background:rgba(212,175,55,0.04);border:0.5px solid var(--border);padding:10px 14px;border-radius:2px;margin-top:6px">${title}</div>
+      </div>
+      <div class="pc-section">
+        <div class="pc-label">13 Tag <button class="cbtn" onclick="copyAllTags(${n},this)" style="margin-left:8px">Tümünü Kopyala</button></div>
+        <div class="tag-chips" id="tags-${n}">${tags.map(t=>`<div class="tchip" onclick="copyText('${t.replace(/'/g,"\\'")}',this)">${t}</div>`).join('')}</div>
+      </div>
+      <div class="pc-section">
+        <div class="pc-label">Açıklama <button class="cbtn" onclick="copyText('${desc.replace(/'/g,"\\'").replace(/\n/g,'\\n')}',this)" style="margin-left:8px">Kopyala</button></div>
+        <div class="pc-content" style="background:rgba(212,175,55,0.04);border:0.5px solid var(--border);padding:10px 14px;border-radius:2px;margin-top:6px;white-space:pre-line">${desc}</div>
+      </div>
+      <div class="pc-section">
+        <div class="pc-label">💰 Kâr Hesabı</div>
+        <div class="profit-box">
+          <div class="profit-row"><span class="profit-label">Üretim Maliyeti (${p.label})</span><span style="color:var(--red)">-$${p.cost.toFixed(2)}</span></div>
+          <div class="profit-row"><span class="profit-label">Etsy Komisyon (%6.5)</span><span style="color:var(--red)">-$${p.etsy.toFixed(2)}</span></div>
+          <div class="profit-row"><span class="profit-label">İşlem Ücreti (%3)</span><span style="color:var(--red)">-$${p.transaction.toFixed(2)}</span></div>
+          <div class="profit-row"><span class="profit-label">Listeleme</span><span style="color:var(--red)">-$${p.listing.toFixed(2)}</span></div>
+          <div class="profit-row"><span class="profit-label" style="font-weight:600">Net Kâr (reklamsız)</span><span class="profit-value">$${p.profit.toFixed(2)}</span></div>
+          <div class="profit-row"><span class="profit-label">Net Kâr (reklamlı, %15)</span><span class="profit-value" style="color:${p.profit_ads>0?'var(--green)':'var(--red)'}">$${p.profit_ads.toFixed(2)}</span></div>
+          ${p.profit_ads<0?`<div class="profit-warning">⚠️ Reklam açarsan zarara girersin! Minimum $${(p.cost+p.total_fees+(price*0.15)+3).toFixed(2)} yaz.</div>`:`<div class="profit-warning">✓ Reklam açsan bile karlısın. İlk 50 satışa kadar bu fiyatta kal, sonra artır.</div>`}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderResults(text){
+  const el=document.getElementById('results');
+  const analysis=extract(text,'ANALYSIS');
+  const psychology=extract(text,'PSYCHOLOGY');
+  const slogans=extract(text,'NEW_SLOGANS');
+
+  el.innerHTML=`
+    <div class="section">
+      <div class="section-head"><div class="section-icon">🔍</div><div class="section-ttl">Ürün Analizi</div></div>
+      <div class="section-body">${analysis}</div>
+    </div>
+    <div class="section">
+      <div class="section-head"><div class="section-icon">🧠</div><div class="section-ttl">Satış Psikolojisi</div></div>
+      <div class="section-body">${psychology}</div>
+    </div>
+    <div class="section">
+      <div class="section-head"><div class="section-icon">💬</div><div class="section-ttl">5 Yeni Slogan Önerisi</div></div>
+      <div class="section-body">${slogans}</div>
+    </div>
+    <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);margin:24px 0 16px">3 Winner Ürün Konsepti</div>
+    <div class="product-cards">
+      ${renderProduct(text,1)}
+      ${renderProduct(text,2)}
+      ${renderProduct(text,3)}
+    </div>
+    <button class="reset-btn" onclick="resetForm()">← Yeni Analiz Yap</button>`;
+
+  el.style.display='block';
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('submitBtn').disabled=false;
+}
+
+function copyText(text,btn){
+  navigator.clipboard.writeText(text.replace(/\\n/g,'\n')).then(()=>{
+    const o=btn.textContent;btn.textContent='✓';btn.classList.add('ok');
+    setTimeout(()=>{btn.textContent=o;btn.classList.remove('ok')},2000);
+  });
+}
+
+function copyAllTags(n,btn){
+  const tags=Array.from(document.querySelectorAll(`#tags-${n} .tchip`)).map(t=>t.textContent).join(', ');
+  navigator.clipboard.writeText(tags).then(()=>{btn.textContent='Kopyalandı ✓';btn.classList.add('ok');setTimeout(()=>{btn.textContent='Tümünü Kopyala';btn.classList.remove('ok')},2000)});
+}
+
+function resetForm(){
+  document.getElementById('results').style.display='none';
+  document.getElementById('formWrap').style.display='block';
+  document.getElementById('submitBtn').disabled=false;
+  photoData=null;
+  document.getElementById('previewImg').style.display='none';
+  document.getElementById('photoArea').classList.remove('has-photo');
+  document.querySelector('.upload-text').textContent='Ekran görüntüsü yüklemek için tıkla';
+  document.querySelector('.upload-sub').textContent='JPG, PNG — Etsy ürün sayfası ekran görüntüsü';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+window.addEventListener('load',async()=>{
+  const saved=localStorage.getItem('ue');
+  if(saved){document.getElementById('userEmail').value=saved;await updateUsage(saved)}
+});
+document.getElementById('userEmail').addEventListener('blur',async function(){
+  if(this.value.includes('@')){localStorage.setItem('ue',this.value);await updateUsage(this.value)}
+});
+</script>
+</body>
+</html>
