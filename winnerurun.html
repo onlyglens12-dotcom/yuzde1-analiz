@@ -324,7 +324,11 @@ async function startAnalysis(){
 
   const prompt=`You are an elite Etsy product strategist and conversion-focused e-commerce expert working with Turkish Etsy sellers.
 
-Analyze the provided product screenshot and generate a complete analysis in TURKISH.
+Analyze the provided product screenshot. 
+- All explanations, analysis, and descriptions: TURKISH
+- All product slogans, design text, and text that will appear ON the product: ENGLISH only
+- Etsy titles and tags: ENGLISH only
+- How-to steps: TURKISH
 
 Store type: ${storeType}
 Preferred product type: ${prodType}
